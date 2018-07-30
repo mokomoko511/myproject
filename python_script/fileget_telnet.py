@@ -11,7 +11,7 @@ from time import sleep
 
 def telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
 
-    #Import cmdlista
+    #Import cmdlist
     cmds = []
     for line in open(cmdlist, 'r').readlines():
         cmds.append(line.strip())
@@ -124,12 +124,16 @@ def main():
     ipaddr=args.ipaddress
     user=args.username
     passwd=args.password
+    techsupport_option=args.techsupport_option
+    config_option=args.config_option
+    directcommand=args.directcommand
     logfolder=args.logfolder
     logfilename=args.logfilename
 
     if args.config_option is True or args.directcommand is not None:
         techsupport_option=False
-    
+
+
     telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename)
 
 if __name__ == '__main__':
