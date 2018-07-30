@@ -9,7 +9,7 @@ import random
 import codecs
 from time import sleep
 
-def telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
+def telnet_main(ipaddr, user, passwd, techsupport_option, config_option, directcommand, logfolder, logfilename):
 
     #Import cmdlist
     cmds = []
@@ -130,11 +130,7 @@ def main():
     logfolder=args.logfolder
     logfilename=args.logfilename
 
-    if args.config_option is True or args.directcommand is not None:
-        techsupport_option=False
-
-
-    telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename)
+    telnet_main(ipaddr, user, passwd, techsupport_option, config_option, directcommand, logfolder, logfilename)
 
 if __name__ == '__main__':
     main()
