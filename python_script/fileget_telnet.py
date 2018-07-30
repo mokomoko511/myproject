@@ -9,13 +9,9 @@ import random
 import codecs
 from time import sleep
 
-def telnet_main(ipaddr, user, passwd, techsupport_option, config_option, directcommand, logfolder, logfilename):
+def telnet_main(ipaddr, user, passwd, tftpserverip, techsupport_option, config_option, logfolder, logfilename):
 
     #Import cmdlist
-    cmds = []
-    for line in open(cmdlist, 'r').readlines():
-        cmds.append(line.strip())
-
     print('Connecting to ' + ipaddr)
     try:
         tn = telnetlib.Telnet(ipaddr,23,30)
@@ -48,26 +44,46 @@ def telnet_main(ipaddr, user, passwd, techsupport_option, config_option, directc
         input('Please input any key...')
         sys.exit()
 
-    #Input commands from cmds list
+    #Judge tech or config, and executing command.
+    now = datetime.datetime.now()
+    timestamps = '%i%.2i%.2i%.2i%.2i%.2i.txt' % (now.year,now.month,now.day,now.hour,now.minute,now.second)
     try:
-        for cmdline in range(len(cmds)):
-            cmditem = cmds[cmdline]
-            print('The next get log for : ' + cmditem)
-            tn.write((cmditem + '\n').encode('ascii'))
-            ret+=tn.read_until(wait_hostname).rstrip()
-            sleep(0.005)
+        if config_option is True:
+            print('Getting config file...')
+            getfilename=hostname_get + '.cfg'
+            #you should insert the choice overwrite flow.
+            tn.write(('copy running-config ' + getfilename + '\n').encode('ascii'))
+            ret+=tn.read_until(b'#')
             tn.read_very_lazy()
-        # print(ret)
+            #Send file to TFTP server.
+            print('Sending ' + getfilename + ' to TFTP server...')
+            tn.write(('copy ' + getfilename + ' tftp://' + tftpserverip + '\n').encode('ascii'))
+            tn.write(('dir' + '\n').encode('ascii'))
+            ret+=tn.read_until(wait_hostname).rstrip()
+        elif techsupport_option is True:
+            print('Getting tech support...')
+            getfilename=('tech-support-' + hostname_get + '-' + timestamps)
+            print('show tech-support outfile ' + getfilename)
+            tn.write(('show tech-support outfile ' + getfilename + '\n').encode('ascii'))
+            sleep(0.005)
+            ret+=tn.read_until(b'#')
+            tn.read_very_lazy()
+            #Send file to TFTP server.
+            print('Sending ' + getfilename + '.gz' + ' to TFTP server...')
+            tn.write(('copy ' + getfilename + '.gz' + ' tftp://' + tftpserverip + '\n').encode('ascii'))
+            tn.write(('\n').encode('ascii'))
+            ret+=tn.read_until(wait_hostname).rstrip()
     except EOFError:
         print('Something went wrong. Please retry host to ' + ipaddr)
         input('Please input any key...')
         sys.exit()
+
     # tn.write(('exit' + '\n').encode('ascii'))
     tn.write(('\n').encode('ascii'))
     ret+=tn.read_until(wait_hostname).rstrip()
     tn.read_very_lazy()
     sleep(1)
-    print('\n' + 'Completed get log. Close connection...')
+    print('\n' + 'Completed get file. Close connection...')
     tn.close()
     ret+=tn.read_all()
 
@@ -106,12 +122,12 @@ def get_args():
         parser.add_argument('ipaddress', help='please set ipaddress', type=str)
         parser.add_argument('username', help='set username', type=str)
         parser.add_argument('password', help='set password', type=str)
+        parser.add_argument('tftpserverip', help='set tftpserver ip', type=str)
 
     parser.add_argument('-t', '--techsupport_option', help='Tech suuport getting option.(default) You can choose config option(-c) instead of this option.',action='store_const', const=True, default=True)
     parser.add_argument('-c', '--config_option', help='Current config file getting option. This option get from created "copy running-config <hostname>.cfg" file.',action='store_const', const=True, default=False)
-    parser.add_argument('-d', '--directcommand', help='Set the get a file command. This option can specify the file to be aquired. For reason, A file must exist in advance.',  type=str)
     parser.add_argument('-f', '--logfolder', help='Set the log folder',  type=str)
-    parser.add_argument('-l', '--logfilename', help='Default logfile name '<hostname>_<date>', you can defined the logfilename',  type=str)
+    parser.add_argument('-l', '--logfilename', help='Default logfile name "<hostname>_<date>", you can defined the logfilename',  type=str)
 
     args = parser.parse_args()
 
@@ -124,13 +140,13 @@ def main():
     ipaddr=args.ipaddress
     user=args.username
     passwd=args.password
+    tftpserverip=args.tftpserverip
     techsupport_option=args.techsupport_option
     config_option=args.config_option
-    directcommand=args.directcommand
     logfolder=args.logfolder
     logfilename=args.logfilename
 
-    telnet_main(ipaddr, user, passwd, techsupport_option, config_option, directcommand, logfolder, logfilename)
+    telnet_main(ipaddr, user, passwd, tftpserverip, techsupport_option, config_option, logfolder, logfilename)
 
 if __name__ == '__main__':
     main()
