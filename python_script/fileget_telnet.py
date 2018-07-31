@@ -52,7 +52,6 @@ def telnet_main(ipaddr, user, passwd, tftpserverip, techsupport_option, config_o
         if config_option is True:
             print('Getting config file...')
             getfilename=hostname_get + '_' + timestamps + '.cfg'
-            #you should insert the choice overwrite flow.
             tn.write(('copy running-config ' + getfilename + '\n').encode('ascii'))
             ret+=tn.read_until(b'#')
             tn.read_very_lazy()
@@ -131,15 +130,11 @@ def get_args():
         parser.add_argument('username', help='set username', type=str)
         parser.add_argument('password', help='set password', type=str)
         parser.add_argument('tftpserverip', help='set tftpserver ip', type=str)
-
     parser.add_argument('-t', '--techsupport_option', help='Tech suuport getting option.(default) You can choose config option(-c) instead of this option.',action='store_const', const=True, default=True)
     parser.add_argument('-c', '--config_option', help='Current config file getting option. This option get from created "copy running-config <hostname>.cfg" file.',action='store_const', const=True, default=False)
     parser.add_argument('-f', '--logfolder', help='Set the log folder',  type=str)
     parser.add_argument('-l', '--logfilename', help='Default logfile name "<hostname>_<date>", you can defined the logfilename',  type=str)
-
     args = parser.parse_args()
-
-
     return(args)
 
 def main():
@@ -151,7 +146,6 @@ def main():
     tftpserverip=args.tftpserverip
     techsupport_option=args.techsupport_option
     config_option=args.config_option
-
     logfolder=args.logfolder
     logfilename=args.logfilename
 
