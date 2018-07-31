@@ -4,13 +4,13 @@ Those tools are get logs by python for specific network device.
 
 ## Description
 These tools are made specific network device's on the assumption of using on Windows.
-- logging_telnet.py
+- logging_telnet.py  
 Getting device log to execute in command list.
 
- - fileget_telnet.py
+ - fileget_telnet.py  
 Getting tech support or configuration program.
 
- - httpserver.py and tftpserver.py
+ - httpserver.py and tftpserver.py  
 HTTP server and TFTP server. Start with one click.
 (TFTP server does not support binary...)
 
@@ -29,7 +29,7 @@ I want to fast and easy getting the network device's logs.
 
 ## Usage
  - "logging_telenet.py" need to execute command list. You must be specified it.
-
+g
 ```
 usage: logging_telnet.exe [-h] [-f LOGFOLDER] [-l LOGFILENAME]
                           ipaddress username password cmdlist
