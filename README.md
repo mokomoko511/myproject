@@ -22,28 +22,31 @@ I want to fast and easy getting the network device's logs.
 ## Requirement
  - Python3.6 or latest
  - To install requests pyinstaller, tftpy, paramiko.
- .. code-block:: python
+```
     $ pip install pyinstaller tftpy paramiko.
-
+```
   pyinstaller need Windows ".exe" binary created.
 
 ## Usage
  - "logging_telenet.py" need to execute command list. You must be specified it.
 
-.. code-block:: python
+```
 usage: logging_telnet.exe [-h] [-f LOGFOLDER] [-l LOGFILENAME]
                           ipaddress username password cmdlist
 logging_telnet.exe: error: the following arguments are required: ipaddress, username, password, cmdlist
+```
 
 
  - "fileget_telnet.py" can select getting the configuration file(-c) or tech support file(-t). Default is tech support.
 
-.. code-block:: python
+```
 usage: fileget_telnet.exe [-h] [-t] [-c] [-f LOGFOLDER] [-l LOGFILENAME]
                          ipaddress username password tftpserverip
 fileget_telnet.exe: error: too few arguments
+```
 
  - "httpserver.py" and "tftpserver.py"
+
 Start ONE click only.
 
 
