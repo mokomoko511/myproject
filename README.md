@@ -50,7 +50,7 @@ Start ONE click only.
 
 ## Licence
 
-[GPL](https://github.com/mokomoko511/myproject/LICENSE)
+[GPL](https://github.com/mokomoko511/myproject/blob/master/LICENSE)
 
 ## Author
 
