@@ -8,6 +8,7 @@ import argparse
 import random
 import codecs
 from time import sleep
+import re
 
 def telnet_main(ipaddr, user, passwd, tftpserverip, techsupport_option, config_option, logfolder, logfilename):
 
@@ -46,31 +47,32 @@ def telnet_main(ipaddr, user, passwd, tftpserverip, techsupport_option, config_o
 
     #Judge tech or config, and executing command.
     now = datetime.datetime.now()
-    timestamps = '%i%.2i%.2i%.2i%.2i%.2i.txt' % (now.year,now.month,now.day,now.hour,now.minute,now.second)
+    timestamps = '%i%.2i%.2i%.2i%.2i%.2i' % (now.year,now.month,now.day,now.hour,now.minute,now.second)
     try:
         if config_option is True:
             print('Getting config file...')
-            getfilename=hostname_get + '.cfg'
+            getfilename=hostname_get + '_' + timestamps + '.cfg'
             #you should insert the choice overwrite flow.
             tn.write(('copy running-config ' + getfilename + '\n').encode('ascii'))
             ret+=tn.read_until(b'#')
             tn.read_very_lazy()
             #Send file to TFTP server.
             print('Sending ' + getfilename + ' to TFTP server...')
-            tn.write(('copy ' + getfilename + ' tftp://' + tftpserverip + '\n').encode('ascii'))
-            tn.write(('dir' + '\n').encode('ascii'))
-            ret+=tn.read_until(wait_hostname).rstrip()
+            tn.write(('copy ' + getfilename + ' tftp://' + tftpserverip + '/' + getfilename + '\n').encode('ascii'))
+            ret+=tn.read_until(b'#')
+            # ret+=tn.read_until(wait_hostname, timeout=5).rstrip()
         elif techsupport_option is True:
             print('Getting tech support...')
-            getfilename=('tech-support-' + hostname_get + '-' + timestamps)
+            getfilename=('tech-support-' + hostname_get + '-' + timestamps + '.txt')
             print('show tech-support outfile ' + getfilename)
             tn.write(('show tech-support outfile ' + getfilename + '\n').encode('ascii'))
             sleep(0.005)
             ret+=tn.read_until(b'#')
             tn.read_very_lazy()
+            getfilename=(getfilename + '.gz')
             #Send file to TFTP server.
-            print('Sending ' + getfilename + '.gz' + ' to TFTP server...')
-            tn.write(('copy ' + getfilename + '.gz' + ' tftp://' + tftpserverip + '\n').encode('ascii'))
+            print('Sending ' + getfilename + ' to TFTP server...')
+            tn.write(('copy ' + getfilename + ' tftp://' + tftpserverip + '/' + getfilename + '\n').encode('ascii'))
             tn.write(('\n').encode('ascii'))
             ret+=tn.read_until(wait_hostname).rstrip()
     except EOFError:
@@ -80,6 +82,12 @@ def telnet_main(ipaddr, user, passwd, tftpserverip, techsupport_option, config_o
 
     # tn.write(('exit' + '\n').encode('ascii'))
     tn.write(('\n').encode('ascii'))
+    ret+=tn.read_until(wait_hostname).rstrip()
+    tn.read_very_lazy()
+    sleep(2)
+    #delete file
+    print('Delete ' + getfilename)
+    tn.write(('delete force ' + getfilename + '\n').encode('ascii'))
     ret+=tn.read_until(wait_hostname).rstrip()
     tn.read_very_lazy()
     sleep(1)
@@ -143,6 +151,7 @@ def main():
     tftpserverip=args.tftpserverip
     techsupport_option=args.techsupport_option
     config_option=args.config_option
+
     logfolder=args.logfolder
     logfilename=args.logfilename
 
