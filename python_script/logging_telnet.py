@@ -11,7 +11,7 @@ from time import sleep
 
 def telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
 
-    #Import cmdlist
+    #Import cmdlists
     cmds = []
     for line in open(cmdlist, 'r').readlines():
         cmds.append(line.strip())
