@@ -23,7 +23,7 @@ I want to fast and easy getting the network device's logs.
  - Python3.6 or latest
  - To install requests pyinstaller, tftpy, paramiko.
 ```
-    $ pip install pyinstaller tftpy paramiko.
+    $ pip install pyinstaller tftpy paramiko
 ```
   pyinstaller need Windows ".exe" binary created.
 
