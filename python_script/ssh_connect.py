@@ -2,66 +2,44 @@
 import sys
 import datetime
 import argparse
-
+import time
 import paramiko
+import re
 
 HOST = '192.168.1.136'
 USER = 'manager'
 PSWD = 'friend'
-LOG_FILE='log.txt'
-
-logger = paramiko.util.logging.getLogger()
-paramiko.util.log_to_file(LOG_FILE)
 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 ssh.connect(HOST, username=USER, password=PSWD)
 
-#output+=stdout.read()
-#stdin, stdout, stderr = ssh.exec_command('show clock')
-#output+=stdout.read()
-#cmdlist = ["show clock\n", "show user\n"]
-#output=stdout.read()
-#print(output)
-stdin, stdout, stderr = ssh.exec_command('enable')
+cmdlist = ["show clock", "show user"]
 
-stdin, stdout, stderr = ssh.exec_command('show run | grep hostname')
-# for line in stdout:
-#     if line == ' ':
-#       hostname="awplus"
-#
-#     hostname=line.strip("hostname"+"\s+")
-#     print(hostname)
-#     print (line.strip('\n'))
+#Login prompt and getting hostname. This method is invoke in shell.
+channel = ssh.invoke_shell()
+while not channel.recv_ready():
+    time.sleep(1)
+results = channel.recv(2048)
+channel.send('enable\n')
+while not channel.recv_ready():
+    time.sleep(1)
+results += channel.recv(2048)
+channel.send('\n')
+while not channel.recv_ready():
+    time.sleep(1)
+results2 = channel.recv(2048)
+r = re.compile(r'\r')
+ret = re.sub(r,'',results.decode('utf-8'))
+host_temp = re.sub('\r\r\n','',results2.decode('utf-8'))
+print(ret)
 
+#Input command list.
+for item in cmdlist:
+    stdin, stdout, stderr = ssh.exec_command(item)
+    print(host_temp + item)
+    for line in stdout:
+        print (line.strip('\n'))
 
-
-#for each in cmdlist:
-#stdin.write('show clock\n')
-#stdin.flush()
-#  print(stdout.readlines())
-#print(stdout.read())
-
-#print '\n'.join(stdout.readlines())
-
-#for line in stdout:
-#    print (line.strip('\n'))
-
-#stdin, stdout, stderr = ssh.exec_command('show run | grep hostname')
-#for line in stdout:
-#    if line == ' ':
-#      hostname="awplus"
-
-#    hostname=line.strip("hostname"+"\s")
-#    print(hostname)
-#    print (line.strip('\n'))
-
-stdin, stdout, stderr = ssh.exec_command('show clock')
-for line in stdout:
-    print (line.strip('\n'))
-
-stdin, stdout, stderr = ssh.exec_command('show run')
-for line in stdout:
-    print (line.strip('\n'))
 
 ssh.close()
