@@ -54,6 +54,6 @@ results += channel.recv(2048)
 print(results.decode('utf-8'))
 
 import re
-r = re.compile(rb'\x1b\[.*?m\[?')
+r = re.compile(r'\x1b\[.*?m\[?')
 print(re.sub(r,'',results))
 client.close()

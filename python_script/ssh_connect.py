@@ -16,7 +16,7 @@ def ssh_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
         input("Please input any key...")
         sys.exit()
 
-    print("ssh connection successful. Start logging after login..." + "\n")
+    print("ssh connection successful. Start logging..." + "\n")
 
     #Login prompt and getting hostname. This method is invoke in shell.
     channel = ssh.invoke_shell()
@@ -43,9 +43,15 @@ def ssh_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
     #Input command list.
     for item in cmds:
         stdin, stdout, stderr = ssh.exec_command(item)
-        print(host_temp + item)
+        ret+=host_temp + item + '\n'
+        print('excute comand : ' +  item)
         for line in stdout:
-            ret+=(line.strip('\n'))
+            ret+=line
+            #ret+=(line.strip('\n'))
+            #print(ret)
+
+    print("\n" + "Completed get log. Close connection...")
+    ssh.close()
 
     #writing result to log file
     if logfilename is not None:
@@ -69,9 +75,9 @@ def ssh_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
     #     ret2=ret.decode('ascii')
     # except UnicodeDecodeError:
     #     ret2=ret.decode('ascii', errors='ignore')
-    print(ret)
+    #print(ret)
     fp.write(ret)
-    ssh.close()
+    fp.close()
 
 def get_args():
     #help ArgumentParser
@@ -91,10 +97,14 @@ def get_args():
 def main():
     args = get_args()
 
-    ipaddr=args.ipaddress
-    user=args.username
-    passwd=args.password
-    cmdlist=args.cmdlist
+    # ipaddr=args.ipaddress
+    # user=args.username
+    # passwd=args.password
+    # cmdlist=args.cmdlist
+    ipaddr='192.168.1.136'
+    user='manager'
+    passwd='friend'
+    cmdlist='G:\myproject\python_script\cmdlist.txt'
     logfolder=args.logfolder
     logfilename=args.logfilename
 
