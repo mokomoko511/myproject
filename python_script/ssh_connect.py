@@ -11,12 +11,12 @@ def ssh_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
         ssh.connect(ipaddr, username=user, password=passwd)
-    except socket.timeout:
-        print("Connetion timeout. Please check IPAddress." )
+    except:
+        print("Connetion timeout. Please check following IPAddress : " + ipaddr)
         input("Please input any key...")
         sys.exit()
 
-    print("ssh connection successful. Start logging..." + "\n")
+    print(ipaddr + " connect to ssh successful. Start logging..." + "\n")
 
     #Login prompt and getting hostname. This method is invoke in shell.
     channel = ssh.invoke_shell()
@@ -35,20 +35,25 @@ def ssh_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
     ret = re.sub(r,'',results.decode('utf-8'))
     host_temp = re.sub('\r\r\n','',results2.decode('utf-8'))
     hostname_get=(host_temp.strip("#"))
+
     #Import cmdlists
     cmds = []
     for line in open(cmdlist, 'r').readlines():
         cmds.append(line.strip())
 
     #Input command list.
-    for item in cmds:
-        stdin, stdout, stderr = ssh.exec_command(item)
-        ret+=host_temp + item + '\n'
-        print('excute comand : ' +  item)
-        for line in stdout:
-            ret+=line
-            #ret+=(line.strip('\n'))
-            #print(ret)
+    try:
+        for item in cmds:
+            stdin, stdout, stderr = ssh.exec_command(item)
+            ret+=host_temp + item + '\n'
+            print('excute command : ' +  item)
+            for line in stdout:
+                ret+=line
+                #print(ret)
+    except:
+        print("Something went wrong. Please retry host to " + ipaddr)
+        input("Please input any key...")
+        sys.exit()
 
     print("\n" + "Completed get log. Close connection...")
     ssh.close()
@@ -71,11 +76,6 @@ def ssh_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
 
     #If the log string was not ascii, that log line ignore.
     fp=open(filename,"w")
-    # try:
-    #     ret2=ret.decode('ascii')
-    # except UnicodeDecodeError:
-    #     ret2=ret.decode('ascii', errors='ignore')
-    #print(ret)
     fp.write(ret)
     fp.close()
 
@@ -97,14 +97,10 @@ def get_args():
 def main():
     args = get_args()
 
-    # ipaddr=args.ipaddress
-    # user=args.username
-    # passwd=args.password
-    # cmdlist=args.cmdlist
-    ipaddr='192.168.1.136'
-    user='manager'
-    passwd='friend'
-    cmdlist='G:\myproject\python_script\cmdlist.txt'
+    ipaddr=args.ipaddress
+    user=args.username
+    passwd=args.password
+    cmdlist=args.cmdlist
     logfolder=args.logfolder
     logfilename=args.logfilename
 

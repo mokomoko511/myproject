@@ -20,11 +20,11 @@ def telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
     try:
         tn = telnetlib.Telnet(ipaddr,23,30)
     except socket.timeout:
-        print("Connetion timeout. Please check IPAddress." )
+        print("Connetion timeout. Please check following IPAddress : " + ipaddr )
         input("Please input any key...")
         sys.exit()
 
-    print("telnet connection successful. Start logging after login..." + "\n")
+    print(ipaddr + " connect to telnet successful. Start logging after login..." + "\n")
     try:
         ret=tn.read_until(b"login:")
         tn.write((user+"\n").encode('ascii'))
@@ -44,7 +44,7 @@ def telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
         tn.write(("terminal length 0"+"\n").encode('ascii'))
         ret+=tn.read_until(b"#")
     except EOFError:
-        print("Cannot login. Please check username or password.")
+        print("Cannot login. Please check username or password of " + ipaddr)
         input("Please input any key...")
         sys.exit()
 
