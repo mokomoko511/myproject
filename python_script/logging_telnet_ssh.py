@@ -19,7 +19,7 @@ def telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
         tn = telnetlib.Telnet(ipaddr,23,30)
     except socket.timeout:
         print("Connetion timeout. Please check following IPAddress : " + ipaddr )
-        input("Please input any key...")
+        input("Please any key to continue...")
         sys.exit()
 
     print(ipaddr + " connect to telnet successful. Start logging after login..." + "\n")
@@ -41,8 +41,8 @@ def telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
         tn.write(("terminal length 0"+"\n").encode('ascii'))
         ret+=tn.read_until(b"#")
     except EOFError:
-        print("Cannot login. Please check username or password of " + ipaddr)
-        input("Please input any key...")
+        print("Cannot login successfully. Please check username or password of " + ipaddr)
+        input("Please any key to continue...")
         sys.exit()
 
     #Input commands from cmds list
@@ -57,14 +57,14 @@ def telnet_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
         # print(ret)
     except EOFError:
         print("Something went wrong. Please retry host to " + ipaddr)
-        input("Please input any key...")
+        input("Please any key to continue...")
         sys.exit()
     # tn.write(("exit" + "\n").encode('ascii'))
     tn.write(("\n").encode('ascii'))
     ret+=tn.read_until(wait_hostname).rstrip()
     tn.read_very_lazy()
     sleep(1)
-    print("\n" + "Completed get log. Close connection...")
+    print("\n" + "Completed get logging. Close connection...")
     tn.close()
     ret+=tn.read_all()
 
@@ -103,7 +103,7 @@ def ssh_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
         ssh.connect(ipaddr, username=user, password=passwd)
     except:
         print("Connetion timeout. Please check following IPAddress : " + ipaddr)
-        input("Please input any key...")
+        input("Please any key to continue...")
         sys.exit()
 
     print(ipaddr + " connect to ssh successful. Start logging..." + "\n")
@@ -142,10 +142,10 @@ def ssh_main(ipaddr, user, passwd, cmdlist, logfolder, logfilename):
                 #print(ret)
     except:
         print("Something went wrong. Please retry host to " + ipaddr)
-        input("Please input any key...")
+        input("Please any key to continue...")
         sys.exit()
 
-    print("\n" + "Completed get log. Close connection...")
+    print("\n" + "Completed get logging. Close connection...")
     ssh.close()
 
     #writing result to log file
